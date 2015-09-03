@@ -3,12 +3,14 @@ package chapter1.part5;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
-public class QuickUnionWithPathCompression {
+public class WeightedQuickUnionByHeight {
 
-	private int[] id;		//access to component id (site indexed)
+
+	private int[] id;		//parent link (site indexed)
+	private int[] height;	//number of nodes connected to root (height)
 	private int count;		//number of components
 	
-	public QuickUnionWithPathCompression(int N) {
+	public WeightedQuickUnionByHeight(int N) {
 		count = N;
 		id = new int[N];
 		for(int i = 0; i < N; i++) {
@@ -25,25 +27,16 @@ public class QuickUnionWithPathCompression {
 	}
 	
 	public int find(int p) {
-		//TODO tror denne fungerer - men klarer ikke sjekke pga at main ikke fungerer som den skal...
-		int pOld = p;
-		int root, temp;
+		int countHeight = 1;
 		
-		//finding the root
+		//follow links to a root
 		while(p != id[p]) {
 			p = id[p];
+			countHeight++;
 		}
 		
-		root = p;
-		p = pOld;
-		
-		//changing every id to root
-		while(id[p] != root) {
-			temp = id[p];
-			id[p] = root;
-			p = temp;
-		}
-		
+		height[p] = countHeight;
+	
 		return p;		
 	}
 	
@@ -53,26 +46,35 @@ public class QuickUnionWithPathCompression {
 		if(i == j)
 			return;
 		
-		id[i] = j;
+		//make smaller root larger one
+		if(height[i] < height[j]) {
+			id[i] = id[j];
+			height[j] += height[i];
+		} else {
+			id[j] = id[i];
+			height[i] += height[j];
+		}
 		
 		count--;
 	}
 	
 	public static void main(String[] args) {
 
-		//read number of sites and initialize that many components
 		int N = StdIn.readInt();
 		QuickUnionWithPathCompression qu = new QuickUnionWithPathCompression(N);
 		
 		while(!StdIn.isEmpty()) {
 			int p = StdIn.readInt();
-			int q = StdIn.readInt();	//read pair to connect
-			if(qu.connected(p, q))		//ignore if connected
+			int q = StdIn.readInt();
+			if(qu.connected(p, q))
 				continue;
-			qu.union(p, q);				//combine components and print connections
+			qu.union(p, q);
 			StdOut.println(p + " " + q);
 		}
 		
 		StdOut.println(qu.count() + " components");	
 	}
+	
+	
+	
 }
