@@ -13,8 +13,10 @@ public class WeightedQuickUnionByHeight {
 	public WeightedQuickUnionByHeight(int N) {
 		count = N;
 		id = new int[N];
+		height = new int[N];
 		for(int i = 0; i < N; i++) {
 			id[i] = i;
+			height[i] = i;		//TODO er denne nødvendig..?? blir jo initialisert i find()
 		}
 	}
 	
@@ -27,15 +29,10 @@ public class WeightedQuickUnionByHeight {
 	}
 	
 	public int find(int p) {
-		int countHeight = 1;
-		
 		//follow links to a root
 		while(p != id[p]) {
 			p = id[p];
-			countHeight++;
 		}
-		
-		height[p] = countHeight;
 	
 		return p;		
 	}
